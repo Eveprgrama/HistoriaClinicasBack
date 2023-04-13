@@ -24,35 +24,45 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Crear roles
-        Rol rolAdmin = new Rol(RolNombre.ROLE_ADMIN);
-        Rol rolUser = new Rol(RolNombre.ROLE_USER);
-        Rol rolMedico = new Rol(RolNombre.ROLE_MEDICO);
-        Rol rolSecretaria = new Rol(RolNombre.ROLE_SECRETARIA);
+        // Verificar si la base de datos ya existe
+        if (!databaseExists()) {
+            // Crear roles
+            Rol rolAdmin = new Rol(RolNombre.ROLE_ADMIN);
+            Rol rolUser = new Rol(RolNombre.ROLE_USER);
+            Rol rolMedico = new Rol(RolNombre.ROLE_MEDICO);
+            Rol rolSecretaria = new Rol(RolNombre.ROLE_SECRETARIA);
 
-        // Guardar roles
-        rolRepository.save(rolAdmin);
-        rolRepository.save(rolUser);
-        rolRepository.save(rolMedico);
-        rolRepository.save(rolSecretaria);
+            // Guardar roles
+            rolRepository.save(rolAdmin);
+            rolRepository.save(rolUser);
+            rolRepository.save(rolMedico);
+            rolRepository.save(rolSecretaria);
 
-        // Crear usuarios con roles asignados
-        Usuario usuarioAdmin = new Usuario("admin", "admin", "admin@gmail.com", "123456");
-        usuarioAdmin.getRoles().add(rolAdmin);
+            // Crear usuarios con roles asignados
+            Usuario usuarioAdmin = new Usuario("admin", "admin", "admin@gmail.com", "123456");
+            usuarioAdmin.getRoles().add(rolAdmin);
 
-        Usuario usuarioUser = new Usuario("user", "user", "user@gmail.com", "123456");
-        usuarioUser.getRoles().add(rolUser);
+            Usuario usuarioUser = new Usuario("user", "user", "user@gmail.com", "123456");
+            usuarioUser.getRoles().add(rolUser);
 
-        Usuario usuarioMedico = new Usuario("medico", "medico", "medico@gmail.com", "123456");
-        usuarioMedico.getRoles().add(rolMedico);
+            Usuario usuarioMedico = new Usuario("medico", "medico", "medico@gmail.com", "123456");
+            usuarioMedico.getRoles().add(rolMedico);
 
-        Usuario usuarioSecretaria = new Usuario("secretaria", "secretaria", "secretaria@gmail.com", "123456");
-        usuarioSecretaria.getRoles().add(rolSecretaria);
+            Usuario usuarioSecretaria = new Usuario("secretaria", "secretaria", "secretaria@gmail.com", "123456");
+            usuarioSecretaria.getRoles().add(rolSecretaria);
 
-        // Guardar usuarios
-        usuarioRepository.save(usuarioAdmin);
-        usuarioRepository.save(usuarioUser);
-        usuarioRepository.save(usuarioMedico);
-        usuarioRepository.save(usuarioSecretaria);
+            // Guardar usuarios
+            usuarioRepository.save(usuarioAdmin);
+            usuarioRepository.save(usuarioUser);
+            usuarioRepository.save(usuarioMedico);
+            usuarioRepository.save(usuarioSecretaria);
+        }
+    }
+
+    private boolean databaseExists() {
+        // Verificar si la base de datos ya existe
+        long count = usuarioRepository.count();
+    return count > 0;
     }
 }
+
