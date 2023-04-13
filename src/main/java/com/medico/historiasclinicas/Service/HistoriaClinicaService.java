@@ -30,7 +30,7 @@ public class HistoriaClinicaService {
     }
 
     public List<HistoriaClinica> buscarPorNombrePaciente(String nombre, String apellido) {
-        return historiaClinicaRepository.findByNombreAndApellidoContainingIgnoreCase(nombre, apellido);
+        return historiaClinicaRepository. findByPacienteNombreAndPacienteApellidoContainingIgnoreCase(nombre, apellido);
     }
 
     public HistoriaClinica guardar(HistoriaClinica historiaClinica) {

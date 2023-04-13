@@ -59,7 +59,7 @@ public class HistoriaClinica {
     public HistoriaClinica() {
     }
 
-    public HistoriaClinica(Long id, LocalDateTime fechaCreacion, String enfermedad, String descripcion, String medicacion, String peso, String altura, String indicaciones, Paciente paciente, List<ArchivoHistoriaClinica> archivosHistoriaClinica, List<Actualizacion> actualizaciones) {
+    public HistoriaClinica(Long id, LocalDateTime fechaCreacion, String enfermedad, String descripcion, String medicacion, String peso, String altura, String indicaciones, Paciente paciente, List<ArchivoHistoriaClinica> archivosHistoriaClinica, List<Actualizacion> actualizaciones, List<ArchivoHistoriaClinica> archivos) {
         this.id = id;
         this.fechaCreacion = fechaCreacion;
         this.enfermedad = enfermedad;
@@ -71,6 +71,7 @@ public class HistoriaClinica {
         this.paciente = paciente;
         this.archivosHistoriaClinica = archivosHistoriaClinica;
         this.actualizaciones = actualizaciones;
+        this.archivos = archivos;
     }
 
 }

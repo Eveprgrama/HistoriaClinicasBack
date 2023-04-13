@@ -20,6 +20,7 @@ public class HistoriaClinicaDTO {
     private List<ArchivoHistoriaClinicaDTO> archivosHistoriaClinica;
     private List<ActualizacionDTO> actualizaciones;
     private List<ArchivoHistoriaClinicaDTO> archivos;
+   
 
     public HistoriaClinicaDTO() {
     }

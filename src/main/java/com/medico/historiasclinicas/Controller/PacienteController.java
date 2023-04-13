@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("pacientes")
+@CrossOrigin(origins = "http://localhost:4200")
 public class PacienteController {
     
     
@@ -34,6 +37,7 @@ public class PacienteController {
     }
 
     @GetMapping("/{dni}")
+    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
     public ResponseEntity<PacienteDTO> buscarPorDni(@PathVariable String dni) {
         Optional<Paciente> pacienteOptional = pacienteService.buscarPorDni(dni);
         if (pacienteOptional.isPresent()) {
@@ -49,6 +53,7 @@ public class PacienteController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
     public ResponseEntity<List<PacienteDTO>> buscarPorNombreYApellido(@RequestParam String nombre, @RequestParam String apellido) {
         List<Paciente> pacientes = pacienteService.buscarPorNombreYApellido(nombre, apellido);
         List<PacienteDTO> pacientesDTO = new ArrayList<>();
@@ -63,6 +68,7 @@ public class PacienteController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
     public ResponseEntity<PacienteDTO> guardarPaciente(@RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = new Paciente();
         paciente.setNombre(pacienteDTO.getNombre());
@@ -77,6 +83,7 @@ public class PacienteController {
     }
 
     @DeleteMapping("/{dni}")
+    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
     public ResponseEntity<String> eliminarPaciente(@PathVariable String dni) {
         Optional<Paciente> pacienteOptional = pacienteService.buscarPorDni(dni);
         if (pacienteOptional.isPresent()) {

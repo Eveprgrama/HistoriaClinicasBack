@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ActualizacionRepository extends JpaRepository<Actualizacion, Long> {
-    List<Actualizacion> findByHistoriaClinicaOrderByFechaDesc(HistoriaClinica historiaClinica);
+     List<Actualizacion> findByHistoriaClinicaOrderByFechaDesc(HistoriaClinica historiaClinica);
 }

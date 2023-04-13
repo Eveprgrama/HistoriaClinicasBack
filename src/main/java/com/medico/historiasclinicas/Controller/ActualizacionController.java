@@ -8,9 +8,10 @@ import com.medico.historiasclinicas.Service.HistoriaClinicaService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("actualizaciones")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ActualizacionController {
 
     private final ActualizacionService actualizacionService;
@@ -33,6 +35,7 @@ public class ActualizacionController {
     }
 
     @PostMapping("/{historiaClinicaId}")
+    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_ADMIN')")
     public ResponseEntity<ActualizacionDTO> guardarActualizacion(@PathVariable Long historiaClinicaId, @RequestBody ActualizacionDTO actualizacionDTO) {
         HistoriaClinica historiaClinica = historiaClinicaService.buscarHistoriaClinicabyId(historiaClinicaId)
                 .orElseThrow(() -> new NoSuchElementException("Historia Clínica no encontrada con ID: " + historiaClinicaId));
@@ -50,6 +53,7 @@ public class ActualizacionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
     public ResponseEntity<ActualizacionDTO> buscarActualizacionPorId(@PathVariable Long id) {
         Actualizacion actualizacion = actualizacionService.buscarActualizacionPorId(id);
 
@@ -63,6 +67,7 @@ public class ActualizacionController {
 //Devuelve una lista de las actualizaciones de la historia clinica
 
     @GetMapping("/historiaClinica/{historiaClinicaId}")
+    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
     public ResponseEntity<List<ActualizacionDTO>> buscarActualizacionesPorHistoriaClinica(@PathVariable Long historiaClinicaId) {
         HistoriaClinica historiaClinica = historiaClinicaService.buscarHistoriaClinicabyId(historiaClinicaId)
                 .orElseThrow(() -> new NoSuchElementException("Historia Clínica no encontrada con ID: " + historiaClinicaId));
@@ -83,6 +88,7 @@ public class ActualizacionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_ADMIN')")
     public ResponseEntity<String> eliminarActualizacion(@PathVariable Long id) {
         actualizacionService.eliminarActualizacion(id);
 
