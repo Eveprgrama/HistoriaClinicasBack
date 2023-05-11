@@ -50,19 +50,20 @@ public class HistoriaClinicaController {
     }
 
 @PostMapping("/nuevas/{idPaciente}")
-public ResponseEntity<HistoriaClinicaDTO> createHistoriaClinica(@RequestBody HistoriaClinicaDTO historiaClinicaDTO, @PathVariable Long idPaciente) {
+public ResponseEntity<HistoriaClinicaDTO> createHistoriaClinica(@RequestBody HistoriaClinicaDTO historiaClinicaDTO, @PathVariable("idPaciente") Long pacienteId) {
     // Verificar si el paciente existe
-    Optional<Paciente> pacienteOptional = pacienteService.buscarPorId(idPaciente);
+    Optional<Paciente> pacienteOptional = pacienteService.buscarPorId(pacienteId);
     if (!pacienteOptional.isPresent()) {
         throw new RuntimeException("No se encontró un paciente con el ID proporcionado.");
     }
 
-    HistoriaClinica nuevaHistoriaClinica = historiaClinicaService.save(historiaClinicaDTO, idPaciente);
+    HistoriaClinica nuevaHistoriaClinica = historiaClinicaService.save(historiaClinicaDTO, pacienteId);
 
     HistoriaClinicaDTO newHistoriaClinicaDTO = historiaClinicaMapper.toDto(nuevaHistoriaClinica);
 
     return ResponseEntity.ok(newHistoriaClinicaDTO);
 }
+
 
 
 
