@@ -56,6 +56,10 @@ public class Paciente {
 
     public Paciente() {
     }
+    
+    public Paciente(Long id) {
+    this.id = id;
+}
 
     public Paciente(Long id, String nombre, String apellido, String dni, LocalDate fechaNacimiento, String direccion, String telefono, String email, List<HistoriaClinica> historiasClinicas) {
         this.id = id;

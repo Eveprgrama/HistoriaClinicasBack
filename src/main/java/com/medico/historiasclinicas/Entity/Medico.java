@@ -30,7 +30,6 @@ public class Medico {
     @Column(nullable = false)
     private String especialidad;
 
-    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)

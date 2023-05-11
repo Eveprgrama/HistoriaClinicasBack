@@ -1,44 +1,118 @@
 
 package com.medico.historiasclinicas.DTO;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter @Setter
+
 public class HistoriaClinicaDTO {
- private Long id;
-    private LocalDateTime fechaCreacion;
+
+    private Long pacienteId;
     private String enfermedad;
     private String descripcion;
     private String medicacion;
-    private String peso;
-    private String altura;
+    private String droga;
+    private String dosis;
+    private Double peso;
+    private Double altura;
     private String indicaciones;
-    private PacienteDTO paciente;
-    private List<ArchivoHistoriaClinicaDTO> archivosHistoriaClinica;
     private List<ActualizacionDTO> actualizaciones;
     private List<ArchivoHistoriaClinicaDTO> archivos;
-   
-
+    
     public HistoriaClinicaDTO() {
     }
 
-   public HistoriaClinicaDTO(Long id, LocalDateTime fechaCreacion, String enfermedad, String descripcion, String medicacion, String peso, String altura, String indicaciones, PacienteDTO paciente, List<ArchivoHistoriaClinicaDTO> archivosHistoriaClinica, List<ActualizacionDTO> actualizaciones, List<ArchivoHistoriaClinicaDTO> archivos) {
-    this.id = id;
-    this.fechaCreacion = fechaCreacion;
-    this.enfermedad = enfermedad;
-    this.descripcion = descripcion;
-    this.medicacion = medicacion;
-    this.peso = peso;
-    this.altura = altura;
-    this.indicaciones = indicaciones;
-    this.paciente = paciente;
-    this.archivosHistoriaClinica = archivosHistoriaClinica;
-    this.actualizaciones = actualizaciones;
-    this.archivos = archivos;
+    public List<ActualizacionDTO> getActualizaciones() {
+        return actualizaciones;
+    }
+
+    public void setActualizaciones(List<ActualizacionDTO> actualizaciones) {
+        this.actualizaciones = actualizaciones;
+    }
+
+    public List<ArchivoHistoriaClinicaDTO> getArchivos() {
+        return archivos;
+    }
+
+    public void setArchivos(List<ArchivoHistoriaClinicaDTO> archivos) {
+        this.archivos = archivos;
+    }
+
+        public Long getPacienteId() {
+            return pacienteId;
+        }
+
+        public void setPacienteId(Long pacienteId) {
+            this.pacienteId = pacienteId;
+        }
+
+        public String getEnfermedad() {
+            return enfermedad;
+        }
+
+        public void setEnfermedad(String enfermedad) {
+            this.enfermedad = enfermedad;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+
+        public void setDescripcion(String descripcion) {
+            this.descripcion = descripcion;
+        }
+
+        public String getMedicacion() {
+            return medicacion;
+        }
+
+        public void setMedicacion(String medicacion) {
+            this.medicacion = medicacion;
+        }
+
+        public String getDroga() {
+            return droga;
+        }
+
+        public void setDroga(String droga) {
+            this.droga = droga;
+        }
+
+        public String getDosis() {
+            return dosis;
+        }
+
+        public void setDosis(String dosis) {
+            this.dosis = dosis;
+        }
+
+        public Double getPeso() {
+            return peso;
+        }
+
+        public void setPeso(Double peso) {
+            this.peso = peso;
+        }
+
+        public Double getAltura() {
+            return altura;
+        }
+
+        public void setAltura(Double altura) {
+            this.altura = altura;
+        }
+
+        public String getIndicaciones() {
+            return indicaciones;
+        }
+
+        public void setIndicaciones(String indicaciones) {
+            this.indicaciones = indicaciones;
+        }
+
 }
-    
-    
-}
+
+
+
+
+
+

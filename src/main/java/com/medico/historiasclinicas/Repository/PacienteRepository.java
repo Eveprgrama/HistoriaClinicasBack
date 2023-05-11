@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
-    Optional<Paciente> findByDni(String dni);
+    Optional <Paciente> findByDni(String dni);
     //esto ignora mayusculas y minusculas al buscar paciene por nombre y apellido
     List<Paciente> findByNombreAndApellidoContainingIgnoreCase(String nombre, String apellido);
 }

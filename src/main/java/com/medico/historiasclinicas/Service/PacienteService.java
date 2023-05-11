@@ -12,9 +12,17 @@ import org.springframework.stereotype.Service;
 public class PacienteService {
         @Autowired
     private PacienteRepository pacienteRepository;
+        
+        public List <Paciente> list(){
+            return pacienteRepository.findAll();
+        }
 
     public Optional<Paciente> buscarPorDni(String dni) {
         return pacienteRepository.findByDni(dni);
+    }
+    
+     public Optional<Paciente> buscarPorId(Long id) {
+        return pacienteRepository.findById(id);
     }
 
     public List<Paciente> buscarPorNombreYApellido(String nombre, String apellido) {

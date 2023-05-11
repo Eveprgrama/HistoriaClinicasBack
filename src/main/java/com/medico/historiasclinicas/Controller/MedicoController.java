@@ -36,6 +36,7 @@ public ResponseEntity<MedicoDTO> buscarMedicoPorId(@PathVariable Long id) {
     medicoDTO.setId(medico.getId());
     medicoDTO.setNombre(medico.getNombre());
     medicoDTO.setApellido(medico.getApellido());
+    medicoDTO.setEspecialidad(medico.getEspecialidad());
     medicoDTO.setMatricula(medico.getMatricula());
 
     return ResponseEntity.ok(medicoDTO);
@@ -52,6 +53,7 @@ public ResponseEntity<List<MedicoDTO>> buscarTodos() {
         medicoDTO.setNombre(medico.getNombre());
         medicoDTO.setApellido(medico.getApellido());
         medicoDTO.setMatricula(medico.getMatricula());
+        medicoDTO.setEspecialidad(medico.getEspecialidad());
 
         medicosDTO.add(medicoDTO);
     }
@@ -59,18 +61,9 @@ public ResponseEntity<List<MedicoDTO>> buscarTodos() {
     return ResponseEntity.ok(medicosDTO);
 }
 
-@PostMapping("/")
-public ResponseEntity<MedicoDTO> guardarMedico(@RequestBody MedicoDTO medicoDTO) {
-    Medico medico = new Medico();
-    medico.setNombre(medicoDTO.getNombre());
-    medico.setApellido(medicoDTO.getApellido());
-    medico.setMatricula(medicoDTO.getMatricula());
-
-    medico = medicoService.guardar(medico);
-
-    medicoDTO.setId(medico.getId());
-
-    return ResponseEntity.ok(medicoDTO);
+@PostMapping("/nuevo")
+  public Medico guardarMedico(@RequestBody Medico medico) {
+  return medicoService.guardar(medico);
 }
 
 @DeleteMapping("/{id}")

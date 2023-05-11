@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,9 +36,20 @@ public class PacienteController {
     public PacienteController(PacienteService pacienteService) {
         this.pacienteService = pacienteService;
     }
+    
+    @GetMapping("/todos")
+    public ResponseEntity<List<Paciente>> list(){
+        List<Paciente> list = pacienteService.list();
+        return new ResponseEntity(list, HttpStatus.OK);   
+    }
 
-    @GetMapping("/{dni}")
-    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<Paciente>> buscarPorId(@PathVariable("id") Long id){
+        Optional<Paciente> paciente = pacienteService.buscarPorId(id);
+        return ResponseEntity.ok().body(paciente);
+    }
+    
+    @GetMapping("/buscar/{dni}")
     public ResponseEntity<PacienteDTO> buscarPorDni(@PathVariable String dni) {
         Optional<Paciente> pacienteOptional = pacienteService.buscarPorDni(dni);
         if (pacienteOptional.isPresent()) {
@@ -52,28 +64,31 @@ public class PacienteController {
         }
     }
 
-    @GetMapping
-    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
-    public ResponseEntity<List<PacienteDTO>> buscarPorNombreYApellido(@RequestParam String nombre, @RequestParam String apellido) {
-        List<Paciente> pacientes = pacienteService.buscarPorNombreYApellido(nombre, apellido);
-        List<PacienteDTO> pacientesDTO = new ArrayList<>();
-        for (Paciente paciente : pacientes) {
-            PacienteDTO pacienteDTO = new PacienteDTO();
-            pacienteDTO.setNombre(paciente.getNombre());
-            pacienteDTO.setApellido(paciente.getApellido());
-            pacienteDTO.setDni(paciente.getDni());
-            pacientesDTO.add(pacienteDTO);
-        }
-        return ResponseEntity.ok(pacientesDTO);
+    @GetMapping("/lista")
+public ResponseEntity<List<PacienteDTO>> buscarPorNombreYApellido(@RequestParam String nombre, @RequestParam String apellido) {
+    List<Paciente> pacientes = pacienteService.buscarPorNombreYApellido(nombre, apellido);
+    List<PacienteDTO> pacientesDTO = new ArrayList<>();
+    for (Paciente paciente : pacientes) {
+        PacienteDTO pacienteDTO = new PacienteDTO();
+        pacienteDTO.setId(paciente.getId()); // Asignar el ID del paciente
+        pacienteDTO.setNombre(paciente.getNombre());
+        pacienteDTO.setApellido(paciente.getApellido());
+        pacienteDTO.setDni(paciente.getDni());
+        pacientesDTO.add(pacienteDTO);
     }
+    return ResponseEntity.ok(pacientesDTO);
+}
 
-    @PostMapping
-    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
+    @PostMapping("/nuevo")
     public ResponseEntity<PacienteDTO> guardarPaciente(@RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = new Paciente();
         paciente.setNombre(pacienteDTO.getNombre());
         paciente.setApellido(pacienteDTO.getApellido());
         paciente.setDni(pacienteDTO.getDni());
+        paciente.setFechaNacimiento(pacienteDTO.getFechaNacimiento());
+        paciente.setDireccion(pacienteDTO.getDireccion());
+        paciente.setTelefono(pacienteDTO.getTelefono());
+        paciente.setEmail(pacienteDTO.getEmail());
 
         paciente = pacienteService.guardar(paciente);
 
@@ -82,8 +97,7 @@ public class PacienteController {
         return ResponseEntity.ok(pacienteDTO);
     }
 
-    @DeleteMapping("/{dni}")
-    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
+    @DeleteMapping("/eliminar/{dni}")
     public ResponseEntity<String> eliminarPaciente(@PathVariable String dni) {
         Optional<Paciente> pacienteOptional = pacienteService.buscarPorDni(dni);
         if (pacienteOptional.isPresent()) {

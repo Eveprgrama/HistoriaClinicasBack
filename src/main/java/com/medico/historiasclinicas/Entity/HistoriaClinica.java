@@ -1,5 +1,6 @@
 package com.medico.historiasclinicas.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +14,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +30,8 @@ public class HistoriaClinica {
     private Long id;
 
     @Column(name = "fecha_creacion", nullable = false)
-    private LocalDateTime fechaCreacion;
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    private Date fechaCreacion;
 
     private String enfermedad;
 
@@ -36,9 +39,13 @@ public class HistoriaClinica {
 
     private String medicacion;
     
-    private String peso;
+    private String droga;
     
-    private String altura;
+    private String dósis;
+    
+    private Double peso;
+    
+    private Double altura;
 
     @Column(nullable = false)
     private String indicaciones;
@@ -59,19 +66,22 @@ public class HistoriaClinica {
     public HistoriaClinica() {
     }
 
-    public HistoriaClinica(Long id, LocalDateTime fechaCreacion, String enfermedad, String descripcion, String medicacion, String peso, String altura, String indicaciones, Paciente paciente, List<ArchivoHistoriaClinica> archivosHistoriaClinica, List<Actualizacion> actualizaciones, List<ArchivoHistoriaClinica> archivos) {
-        this.id = id;
-        this.fechaCreacion = fechaCreacion;
-        this.enfermedad = enfermedad;
-        this.descripcion = descripcion;
-        this.medicacion = medicacion;
-        this.peso = peso;
-        this.altura = altura;
-        this.indicaciones = indicaciones;
-        this.paciente = paciente;
-        this.archivosHistoriaClinica = archivosHistoriaClinica;
-        this.actualizaciones = actualizaciones;
-        this.archivos = archivos;
-    }
+public HistoriaClinica(Long id, Date fechaCreacion, String enfermedad, String descripcion, String medicacion, String droga, String dosis, Double peso, Double altura, String indicaciones, Paciente paciente, List<ArchivoHistoriaClinica> archivosHistoriaClinica) {
+    this.id = id;
+    this.fechaCreacion = fechaCreacion;
+    this.enfermedad = enfermedad;
+    this.descripcion = descripcion;
+    this.medicacion = medicacion;
+    this.droga = droga;
+    this.dósis = dosis;
+    this.peso = peso;
+    this.altura = altura;
+    this.indicaciones = indicaciones;
+    this.paciente = paciente;
+    this.archivosHistoriaClinica = archivosHistoriaClinica;
+}
+
+
+
 
 }

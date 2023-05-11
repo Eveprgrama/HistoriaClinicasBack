@@ -87,7 +87,7 @@ public class ActualizacionController {
         return ResponseEntity.ok(actualizacionesDTO);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_ADMIN')")
     public ResponseEntity<String> eliminarActualizacion(@PathVariable Long id) {
         actualizacionService.eliminarActualizacion(id);

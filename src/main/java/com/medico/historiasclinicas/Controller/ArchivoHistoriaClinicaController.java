@@ -38,7 +38,7 @@ public class ArchivoHistoriaClinicaController {
         return new ResponseEntity<>(archivo.getArchivo(), headers, HttpStatus.OK);
     }
 
-    @PostMapping("/{historiaClinicaId}")
+    @PostMapping("/nuevo/{historiaClinicaId}")
     public ResponseEntity<String> guardarArchivoHistoriaClinica(@RequestParam("file") MultipartFile file, @PathVariable Long historiaClinicaId) throws IOException {
         archivoHistoriaClinicaService.guardarArchivoHistoriaClinica(file, historiaClinicaId);
         return ResponseEntity.status(HttpStatus.CREATED).body("Archivo subido correctamente.");
