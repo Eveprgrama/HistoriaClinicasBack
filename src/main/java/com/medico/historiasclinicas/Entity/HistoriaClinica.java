@@ -29,9 +29,8 @@ public class HistoriaClinica {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fecha_creacion", nullable = false)
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private Date fechaCreacion;
+@Column(name = "fecha_creacion", nullable = false)
+  private String fechaCreacion;
 
     private String enfermedad;
 
@@ -66,7 +65,7 @@ public class HistoriaClinica {
     public HistoriaClinica() {
     }
 
-public HistoriaClinica(Long id, Date fechaCreacion, String enfermedad, String descripcion, String medicacion, String droga, String dosis, Double peso, Double altura, String indicaciones, Paciente paciente, List<ArchivoHistoriaClinica> archivosHistoriaClinica) {
+public HistoriaClinica(Long id, String fechaCreacion, String enfermedad, String descripcion, String medicacion, String droga, String dosis, Double peso, Double altura, String indicaciones, Paciente paciente, List<ArchivoHistoriaClinica> archivosHistoriaClinica) {
     this.id = id;
     this.fechaCreacion = fechaCreacion;
     this.enfermedad = enfermedad;

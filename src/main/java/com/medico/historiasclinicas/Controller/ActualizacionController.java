@@ -1,7 +1,10 @@
 package com.medico.historiasclinicas.Controller;
 
 import com.medico.historiasclinicas.DTO.ActualizacionDTO;
+import com.medico.historiasclinicas.DTO.ArchivoHistoriaClinicaDTO;
+import com.medico.historiasclinicas.DTO.HistoriaClinicaDTO;
 import com.medico.historiasclinicas.Entity.Actualizacion;
+import com.medico.historiasclinicas.Entity.ArchivoHistoriaClinica;
 import com.medico.historiasclinicas.Entity.HistoriaClinica;
 import com.medico.historiasclinicas.Service.ActualizacionService;
 import com.medico.historiasclinicas.Service.HistoriaClinicaService;
@@ -35,21 +38,10 @@ public class ActualizacionController {
     }
 
     @PostMapping("/{historiaClinicaId}")
-    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_ADMIN')")
     public ResponseEntity<ActualizacionDTO> guardarActualizacion(@PathVariable Long historiaClinicaId, @RequestBody ActualizacionDTO actualizacionDTO) {
-        HistoriaClinica historiaClinica = historiaClinicaService.buscarHistoriaClinicabyId(historiaClinicaId)
-                .orElseThrow(() -> new NoSuchElementException("Historia Clínica no encontrada con ID: " + historiaClinicaId));
-
-        Actualizacion actualizacion = new Actualizacion();
-        actualizacion.setFecha(actualizacionDTO.getFecha());
-        actualizacion.setDescripcion(actualizacionDTO.getDescripcion());
-        actualizacion.setHistoriaClinica(historiaClinica);
-
-        actualizacion = actualizacionService.guardarActualizacion(actualizacion);
-
-        actualizacionDTO.setId(actualizacion.getId());
-
-        return ResponseEntity.ok(actualizacionDTO);
+        actualizacionDTO.setHistoriaClinicaId(historiaClinicaId);
+        ActualizacionDTO savedActualizacionDTO = actualizacionService.guardarActualizacion(actualizacionDTO);
+        return ResponseEntity.ok(savedActualizacionDTO);
     }
 
     @GetMapping("/{id}")
@@ -61,18 +53,41 @@ public class ActualizacionController {
         actualizacionDTO.setId(actualizacion.getId());
         actualizacionDTO.setFecha(actualizacion.getFecha());
         actualizacionDTO.setDescripcion(actualizacion.getDescripcion());
+        actualizacionDTO.setIndicaciones(actualizacion.getIndicaciones());
+        actualizacion.setMedicacion(actualizacionDTO.getMedicacion());
+        actualizacionDTO.setDroga(actualizacion.getDroga());
+        actualizacionDTO.setDosis(actualizacion.getDosis());
+        actualizacionDTO.setPeso(actualizacion.getPeso());
+        actualizacionDTO.setAltura(actualizacion.getAltura());
 
         return ResponseEntity.ok(actualizacionDTO);
     }
 //Devuelve una lista de las actualizaciones de la historia clinica
 
     @GetMapping("/historiaClinica/{historiaClinicaId}")
-    @PreAuthorize("hasAnyRole('ROLE_MEDICO', 'ROLE_SECRETARIA', 'ROLE_ADMIN')")
-    public ResponseEntity<List<ActualizacionDTO>> buscarActualizacionesPorHistoriaClinica(@PathVariable Long historiaClinicaId) {
+    public ResponseEntity<HistoriaClinicaDTO> buscarActualizacionesPorHistoriaClinicaOrdenadas(@PathVariable Long historiaClinicaId) {
         HistoriaClinica historiaClinica = historiaClinicaService.buscarHistoriaClinicabyId(historiaClinicaId)
                 .orElseThrow(() -> new NoSuchElementException("Historia Clínica no encontrada con ID: " + historiaClinicaId));
 
-        List<Actualizacion> actualizaciones = actualizacionService.buscarActualizacionesPorHistoriaClinica(historiaClinica);
+        List<Actualizacion> actualizaciones = actualizacionService.buscarActualizacionesPorHistoriaClinicaOrdenadas(historiaClinica);
+
+        HistoriaClinicaDTO historiaClinicaDTO = new HistoriaClinicaDTO();
+        historiaClinicaDTO.setPacienteId(historiaClinica.getPaciente().getId()); // Suponiendo que tienes una relación con Paciente
+        historiaClinicaDTO.setFechaCreacion(historiaClinica.getFechaCreacion());
+        historiaClinicaDTO.setEnfermedad(historiaClinica.getEnfermedad());
+        historiaClinicaDTO.setDescripcion(historiaClinica.getDescripcion());
+        historiaClinicaDTO.setMedicacion(historiaClinica.getMedicacion());
+        historiaClinicaDTO.setDroga(historiaClinica.getDroga());
+        historiaClinicaDTO.setDosis(historiaClinica.getDósis());
+        historiaClinicaDTO.setPeso(historiaClinica.getPeso());
+        historiaClinicaDTO.setAltura(historiaClinica.getAltura());
+        historiaClinicaDTO.setIndicaciones(historiaClinica.getIndicaciones());
+        // Suponiendo que tienes un método para convertir la lista de archivos a DTOs
+        List<ArchivoHistoriaClinicaDTO> archivosDTO = new ArrayList<>();
+        for (ArchivoHistoriaClinica archivo : historiaClinica.getArchivos()) {
+            archivosDTO.add(new ArchivoHistoriaClinicaDTO(archivo));
+        }
+        historiaClinicaDTO.setArchivos(archivosDTO);
 
         List<ActualizacionDTO> actualizacionesDTO = new ArrayList<>();
         for (Actualizacion actualizacion : actualizaciones) {
@@ -80,11 +95,19 @@ public class ActualizacionController {
             actualizacionDTO.setId(actualizacion.getId());
             actualizacionDTO.setFecha(actualizacion.getFecha());
             actualizacionDTO.setDescripcion(actualizacion.getDescripcion());
+            actualizacionDTO.setIndicaciones(actualizacion.getIndicaciones());
+            actualizacion.setMedicacion(actualizacionDTO.getMedicacion());
+            actualizacionDTO.setDroga(actualizacion.getDroga());
+            actualizacionDTO.setDosis(actualizacion.getDosis());
+            actualizacionDTO.setPeso(actualizacion.getPeso());
+            actualizacionDTO.setAltura(actualizacion.getAltura());
 
             actualizacionesDTO.add(actualizacionDTO);
         }
 
-        return ResponseEntity.ok(actualizacionesDTO);
+        historiaClinicaDTO.setActualizaciones(actualizacionesDTO);
+
+        return ResponseEntity.ok(historiaClinicaDTO);
     }
 
     @DeleteMapping("{id}")

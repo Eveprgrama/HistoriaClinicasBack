@@ -13,6 +13,7 @@ import com.medico.historiasclinicas.Repository.HistoriaClinicaRepository;
 import com.medico.historiasclinicas.Repository.PacienteRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class HistoriaClinicaService {
 
     @Autowired

@@ -4,6 +4,8 @@ package com.medico.historiasclinicas.Controller;
 import com.medico.historiasclinicas.Entity.ArchivoHistoriaClinica;
 import com.medico.historiasclinicas.Service.ArchivoHistoriaClinicaService;
 import java.io.IOException;
+import java.util.NoSuchElementException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,35 +21,50 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("historiasclinicas/archivos")
+@RequestMapping("/archivos")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ArchivoHistoriaClinicaController {
-
     private final ArchivoHistoriaClinicaService archivoHistoriaClinicaService;
 
+    @Autowired
     public ArchivoHistoriaClinicaController(ArchivoHistoriaClinicaService archivoHistoriaClinicaService) {
         this.archivoHistoriaClinicaService = archivoHistoriaClinicaService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<byte[]> obtenerArchivoHistoriaClinica(@PathVariable Long id) {
-        ArchivoHistoriaClinica archivo = archivoHistoriaClinicaService.buscarArchivoHistoriaClinicaPorId(id);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + archivo.getNombre() + "\"");
-        headers.setContentType(MediaType.parseMediaType(archivo.getTipo()));
-        return new ResponseEntity<>(archivo.getArchivo(), headers, HttpStatus.OK);
+    @PostMapping("/{historiaClinicaId}")
+    public ResponseEntity<?> subirArchivo(@RequestParam("archivo") MultipartFile archivo,
+                                          @PathVariable("historiaClinicaId") Long historiaClinicaId) {
+        try {
+            ArchivoHistoriaClinica archivoGuardado = archivoHistoriaClinicaService.guardarArchivoHistoriaClinica(archivo, historiaClinicaId);
+            return ResponseEntity.ok(archivoGuardado);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
-    @PostMapping("/nuevo/{historiaClinicaId}")
-    public ResponseEntity<String> guardarArchivoHistoriaClinica(@RequestParam("file") MultipartFile file, @PathVariable Long historiaClinicaId) throws IOException {
-        archivoHistoriaClinicaService.guardarArchivoHistoriaClinica(file, historiaClinicaId);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Archivo subido correctamente.");
+    @GetMapping("/{archivoId}")
+    public ResponseEntity<?> descargarArchivo(@PathVariable("archivoId") Long archivoId) {
+        try {
+            ArchivoHistoriaClinica archivo = archivoHistoriaClinicaService.buscarArchivoHistoriaClinicaPorId(archivoId);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + archivo.getNombre() + "\"");
+            headers.setContentType(MediaType.parseMediaType(archivo.getTipo()));
+            return new ResponseEntity<>(archivo.getBytes(), headers, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al descargar el archivo");
+        }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarArchivoHistoriaClinica(@PathVariable Long id) {
-        archivoHistoriaClinicaService.eliminarArchivoHistoriaClinica(id);
-        return ResponseEntity.status(HttpStatus.OK).body("Archivo eliminado correctamente.");
+    @DeleteMapping("/{archivoId}")
+    public ResponseEntity<?> eliminarArchivo(@PathVariable("archivoId") Long archivoId) {
+        try {
+            archivoHistoriaClinicaService.eliminarArchivoHistoriaClinica(archivoId);
+            return ResponseEntity.ok("Archivo eliminado correctamente");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
-
 }
+

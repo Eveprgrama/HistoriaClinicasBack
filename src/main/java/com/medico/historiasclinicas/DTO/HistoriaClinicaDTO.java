@@ -1,12 +1,18 @@
 
 package com.medico.historiasclinicas.DTO;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
 public class HistoriaClinicaDTO {
 
     private Long pacienteId;
+    private String fechaCreacion;
     private String enfermedad;
     private String descripcion;
     private String medicacion;
@@ -21,16 +27,59 @@ public class HistoriaClinicaDTO {
     public HistoriaClinicaDTO() {
     }
 
-    public List<ActualizacionDTO> getActualizaciones() {
-        return actualizaciones;
+public HistoriaClinicaDTO(Long pacienteId, String fechaCreacion, String enfermedad, String descripcion, String medicacion, String droga, String dosis, Double peso, Double altura, String indicaciones, List<ActualizacionDTO> actualizaciones, List<ArchivoHistoriaClinicaDTO> archivos) {
+    this.pacienteId = pacienteId;
+    this.fechaCreacion = fechaCreacion;
+    this.enfermedad = enfermedad;
+    this.descripcion = descripcion;
+    this.medicacion = medicacion;
+    this.droga = droga;
+    this.dosis = dosis;
+    this.peso = peso;
+    this.altura = altura;
+    this.indicaciones = indicaciones;
+    this.actualizaciones = actualizaciones;
+    this.archivos = archivos;
+}
+
+
+    
+    public String getFechaCreacion() {
+        return fechaCreacion;
     }
+
+public void setFechaCreacion(String fechaCreacion) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    if (fechaCreacion != null && !fechaCreacion.isEmpty()) {
+        try {
+            LocalDate fecha = formatter.parse(fechaCreacion, LocalDate::from);
+            this.fechaCreacion = formatter.format(fecha);
+        } catch (DateTimeParseException e) {
+            this.fechaCreacion = LocalDate.now().format(formatter);
+        }
+    } else {
+        this.fechaCreacion = LocalDate.now().format(formatter);
+    }
+}
+
+
+    
+   public List<ActualizacionDTO> getActualizaciones() {
+    if (actualizaciones == null) {
+        return Collections.emptyList();
+    }
+    return actualizaciones;
+}
+
+public List<ArchivoHistoriaClinicaDTO> getArchivos() {
+    if (archivos == null) {
+        return Collections.emptyList();
+    }
+    return archivos;
+}
 
     public void setActualizaciones(List<ActualizacionDTO> actualizaciones) {
         this.actualizaciones = actualizaciones;
-    }
-
-    public List<ArchivoHistoriaClinicaDTO> getArchivos() {
-        return archivos;
     }
 
     public void setArchivos(List<ArchivoHistoriaClinicaDTO> archivos) {

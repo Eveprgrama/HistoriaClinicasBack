@@ -1,9 +1,12 @@
 
 package com.medico.historiasclinicas.Service;
 
+import com.medico.historiasclinicas.DTO.ActualizacionDTO;
 import com.medico.historiasclinicas.Entity.Actualizacion;
 import com.medico.historiasclinicas.Entity.HistoriaClinica;
+import com.medico.historiasclinicas.Mapper.ActualizacionMapper;
 import com.medico.historiasclinicas.Repository.ActualizacionRepository;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -11,19 +14,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class ActualizacionService {
     private final ActualizacionRepository actualizacionRepository;
     private final HistoriaClinicaService historiaClinicaService;
     private HistoriaClinica historiaClinica;
+    private final ActualizacionMapper actualizacionMapper;
     
     @Autowired
-    public ActualizacionService(ActualizacionRepository actualizacionRepository, HistoriaClinicaService historiaClinicaService) {
+    public ActualizacionService(ActualizacionRepository actualizacionRepository, HistoriaClinicaService historiaClinicaService, ActualizacionMapper actualizacionMapper) {
         this.actualizacionRepository = actualizacionRepository;
         this.historiaClinicaService = historiaClinicaService;
+        this.actualizacionMapper = actualizacionMapper;
     }
 
-    public Actualizacion guardarActualizacion(Actualizacion actualizacion) {
-        return actualizacionRepository.save(actualizacion);
+    public ActualizacionDTO guardarActualizacion(ActualizacionDTO actualizacionDTO) {
+        Actualizacion actualizacion = actualizacionMapper.toEntity(actualizacionDTO);
+        Actualizacion savedActualizacion = actualizacionRepository.save(actualizacion);
+        return actualizacionMapper.toDto(savedActualizacion);
     }
 
     public Actualizacion buscarActualizacionPorId(Long id) {
@@ -31,7 +39,7 @@ public class ActualizacionService {
                 .orElseThrow(() -> new NoSuchElementException("Actualizacion no encontrada con ID: " + id));
     }
 
-    public List<Actualizacion> buscarActualizacionesPorHistoriaClinica(HistoriaClinica historiaClinica) {
+     public List<Actualizacion> buscarActualizacionesPorHistoriaClinicaOrdenadas(HistoriaClinica historiaClinica) {
         return actualizacionRepository.findByHistoriaClinicaOrderByFechaDesc(historiaClinica);
     }
 

@@ -12,29 +12,27 @@ import com.medico.historiasclinicas.Mapper.ArchivoHistoriaClinicaMapper;
 import com.medico.historiasclinicas.Mapper.HistoriaClinicaMapper;
 import com.medico.historiasclinicas.Repository.HistoriaClinicaRepository;
 import com.medico.historiasclinicas.Repository.PacienteRepository;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
-  
+
     @Autowired
     ActualizacionMapper actualizacionMapper;
 
     @Autowired
     ArchivoHistoriaClinicaMapper archivoHistoriaClinicaMapper;
-    
+
     @Autowired
     PacienteRepository pacienteRepository;
-    
+
     @Autowired
     HistoriaClinicaRepository historiaClinicaRepository;
-    
+
     @Bean
     public HistoriaClinicaMapper historiaClinicaMapper() {
         return new HistoriaClinicaMapper() {
@@ -54,20 +52,25 @@ public class AppConfig {
                 dto.setPeso(historiaClinica.getPeso());
                 dto.setAltura(historiaClinica.getAltura());
                 dto.setIndicaciones(historiaClinica.getIndicaciones());
+                dto.setFechaCreacion(historiaClinica.getFechaCreacion());
 
-                // Mapea las actualizaciones
-                List<ActualizacionDTO> actualizacionesDto = historiaClinica.getActualizaciones()
-                        .stream()
-                        .map(actualizacionMapper::toDto)
-                        .collect(Collectors.toList());
-                dto.setActualizaciones(actualizacionesDto);
+                // Mapea las actualizaciones si no es nulo
+                if (historiaClinica.getActualizaciones() != null) {
+                    List<ActualizacionDTO> actualizacionesDto = historiaClinica.getActualizaciones()
+                            .stream()
+                            .map(actualizacionMapper::toDto)
+                            .collect(Collectors.toList());
+                    dto.setActualizaciones(actualizacionesDto);
+                }
 
-                // Mapea los archivos
-                List<ArchivoHistoriaClinicaDTO> archivosDto = historiaClinica.getArchivos()
-                        .stream()
-                        .map(archivoHistoriaClinicaMapper::toDto)
-                        .collect(Collectors.toList());
-                dto.setArchivos(archivosDto);
+                // Mapea los archivos si no es nulo
+                if (historiaClinica.getArchivos() != null) {
+                    List<ArchivoHistoriaClinicaDTO> archivosDto = historiaClinica.getArchivos()
+                            .stream()
+                            .map(archivoHistoriaClinicaMapper::toDto)
+                            .collect(Collectors.toList());
+                    dto.setArchivos(archivosDto);
+                }
 
                 return dto;
             }
@@ -89,31 +92,38 @@ public class AppConfig {
                 entity.setPeso(historiaClinicaDTO.getPeso());
                 entity.setAltura(historiaClinicaDTO.getAltura());
                 entity.setIndicaciones(historiaClinicaDTO.getIndicaciones());
+                entity.setFechaCreacion(historiaClinicaDTO.getFechaCreacion());
 
                 // Mapea las actualizaciones
-                List<Actualizacion> actualizaciones = historiaClinicaDTO.getActualizaciones()
-                        .stream()
-                        .map(actualizacionMapper::toEntity)
-                        .collect(Collectors.toList());
+                List<Actualizacion> actualizaciones = null;
+                if (historiaClinicaDTO.getActualizaciones() != null) {
+                    actualizaciones = historiaClinicaDTO.getActualizaciones()
+                            .stream()
+                            .map(actualizacionMapper::toEntity)
+                            .collect(Collectors.toList());
+                }
                 entity.setActualizaciones(actualizaciones);
 
                 // Mapea los archivos
-                List<ArchivoHistoriaClinica> archivos = historiaClinicaDTO.getArchivos()
-                        .stream()
-                        .map(archivoHistoriaClinicaMapper::toEntity)
-                        .collect(Collectors.toList());
+                List<ArchivoHistoriaClinica> archivos = null;
+                if (historiaClinicaDTO.getArchivos() != null) {
+                    archivos = historiaClinicaDTO.getArchivos()
+                            .stream()
+                            .map(archivoHistoriaClinicaMapper::toEntity)
+                            .collect(Collectors.toList());
+                }
                 entity.setArchivos(archivos);
 
                 return entity;
             }
-            
+
             private Paciente getPacienteFromId(Long id) {
                 return pacienteRepository.findById(id).orElse(null);
             }
         };
     }
-            
-       @Bean
+
+    @Bean
     public ActualizacionMapper actualizacionMapper() {
         return new ActualizacionMapper() {
 
@@ -126,6 +136,12 @@ public class AppConfig {
                 actualizacionDTO.setId(actualizacion.getId());
                 actualizacionDTO.setFecha(actualizacion.getFecha());
                 actualizacionDTO.setDescripcion(actualizacion.getDescripcion());
+                actualizacionDTO.setIndicaciones(actualizacion.getIndicaciones());
+                actualizacionDTO.setMedicacion(actualizacion.getMedicacion());
+                actualizacionDTO.setDroga(actualizacion.getDroga());
+                actualizacionDTO.setDosis(actualizacion.getDosis());
+                actualizacionDTO.setPeso(actualizacion.getPeso());
+                actualizacionDTO.setAltura(actualizacion.getAltura());
                 actualizacionDTO.setHistoriaClinicaId(actualizacion.getHistoriaClinica().getId());
 
                 return actualizacionDTO;
@@ -140,14 +156,19 @@ public class AppConfig {
                 actualizacion.setId(actualizacionDTO.getId());
                 actualizacion.setFecha(actualizacionDTO.getFecha());
                 actualizacion.setDescripcion(actualizacionDTO.getDescripcion());
+                actualizacion.setIndicaciones(actualizacionDTO.getIndicaciones());
                 actualizacion.setHistoriaClinica(getHistoriaClinicaFromId(actualizacionDTO.getHistoriaClinicaId()));
+                actualizacion.setMedicacion(actualizacionDTO.getMedicacion());
+                actualizacion.setDroga(actualizacionDTO.getDroga());
+                actualizacion.setDosis(actualizacionDTO.getDosis());
+                actualizacion.setPeso(actualizacionDTO.getPeso());
+                actualizacion.setAltura(actualizacionDTO.getAltura());
 
                 return actualizacion;
             }
 
             private HistoriaClinica getHistoriaClinicaFromId(Long id) {
-                 historiaClinicaRepository.findById(id).orElse(null);
-                throw new UnsupportedOperationException("Implementar la búsqueda de HistoriaClinica por ID.");
+                return historiaClinicaRepository.findById(id).orElse(null);
             }
         };
     }
@@ -165,7 +186,7 @@ public class AppConfig {
                 archivoHistoriaClinicaDTO.setNombre(archivoHistoriaClinica.getNombre());
                 archivoHistoriaClinicaDTO.setTipo(archivoHistoriaClinica.getTipo());
                 // Aquí asumimos que convertimos el archivo byte[] a un String, necesitarás adaptar esto si es incorrecto
-                archivoHistoriaClinicaDTO.setArchivo(Base64.getEncoder().encodeToString(archivoHistoriaClinica.getArchivo()));
+                archivoHistoriaClinicaDTO.setUrl(archivoHistoriaClinica.getUrl());
                 archivoHistoriaClinicaDTO.setHistoriaClinicaId(archivoHistoriaClinica.getHistoriaClinica().getId());
 
                 return archivoHistoriaClinicaDTO;
@@ -177,22 +198,17 @@ public class AppConfig {
                     return null;
                 }
                 ArchivoHistoriaClinica archivoHistoriaClinica = new ArchivoHistoriaClinica();
-                archivoHistoriaClinica.setId(archivoHistoriaClinicaDTO.getId());
                 archivoHistoriaClinica.setNombre(archivoHistoriaClinicaDTO.getNombre());
-                                archivoHistoriaClinica.setTipo(archivoHistoriaClinicaDTO.getTipo());
-                // Aquí asumimos que convertimos un String a un archivo byte[], necesitarás adaptar esto si es incorrecto
-                archivoHistoriaClinica.setArchivo(Base64.getDecoder().decode(archivoHistoriaClinicaDTO.getArchivo()));
+                archivoHistoriaClinica.setTipo(archivoHistoriaClinicaDTO.getTipo());
+                archivoHistoriaClinica.setUrl(archivoHistoriaClinicaDTO.getUrl());
                 archivoHistoriaClinica.setHistoriaClinica(getHistoriaClinicaFromId(archivoHistoriaClinicaDTO.getHistoriaClinicaId()));
 
                 return archivoHistoriaClinica;
             }
 
             private HistoriaClinica getHistoriaClinicaFromId(Long id) {
-                 return historiaClinicaRepository.findById(id).orElse(null);
+                return historiaClinicaRepository.findById(id).orElse(null);
             }
         };
     }
-
 }
-    
-
