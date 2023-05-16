@@ -1,6 +1,6 @@
-
 package com.medico.historiasclinicas.Controller;
 
+import com.medico.historiasclinicas.Cloud.CloudStorageService;
 import com.medico.historiasclinicas.Entity.ArchivoHistoriaClinica;
 import com.medico.historiasclinicas.Service.ArchivoHistoriaClinicaService;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/archivos")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ArchivoHistoriaClinicaController {
+
     private final ArchivoHistoriaClinicaService archivoHistoriaClinicaService;
 
     @Autowired
@@ -31,9 +32,12 @@ public class ArchivoHistoriaClinicaController {
         this.archivoHistoriaClinicaService = archivoHistoriaClinicaService;
     }
 
+    @Autowired
+    private CloudStorageService cloudStorageService;
+
     @PostMapping("/{historiaClinicaId}")
     public ResponseEntity<?> subirArchivo(@RequestParam("archivo") MultipartFile archivo,
-                                          @PathVariable("historiaClinicaId") Long historiaClinicaId) {
+            @PathVariable("historiaClinicaId") Long historiaClinicaId) throws IOException {
         try {
             ArchivoHistoriaClinica archivoGuardado = archivoHistoriaClinicaService.guardarArchivoHistoriaClinica(archivo, historiaClinicaId);
             return ResponseEntity.ok(archivoGuardado);
@@ -49,7 +53,11 @@ public class ArchivoHistoriaClinicaController {
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + archivo.getNombre() + "\"");
             headers.setContentType(MediaType.parseMediaType(archivo.getTipo()));
-            return new ResponseEntity<>(archivo.getBytes(), headers, HttpStatus.OK);
+
+            // Descarga el archivo de S3
+            byte[] contenido = cloudStorageService.descargarArchivo(archivo.getNombre());
+
+            return new ResponseEntity<>(contenido, headers, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IOException e) {
@@ -66,5 +74,5 @@ public class ArchivoHistoriaClinicaController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-}
 
+}
