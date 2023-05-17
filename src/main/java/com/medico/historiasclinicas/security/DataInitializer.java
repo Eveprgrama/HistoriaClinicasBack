@@ -11,6 +11,7 @@ import com.medico.historiasclinicas.security.repository.iRolRepository;
 import com.medico.historiasclinicas.security.repository.iUsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,42 +23,46 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private iRolRepository rolRepository;
 
-    @Override
-    public void run(String... args) throws Exception {
-        // Verificar si la base de datos ya existe
-        if (!databaseExists()) {
-            // Crear roles
-            Rol rolAdmin = new Rol(RolNombre.ROLE_ADMIN);
-            Rol rolUser = new Rol(RolNombre.ROLE_USER);
-            Rol rolMedico = new Rol(RolNombre.ROLE_MEDICO);
-            Rol rolSecretaria = new Rol(RolNombre.ROLE_SECRETARIA);
+@Autowired
+private PasswordEncoder passwordEncoder;
 
-            // Guardar roles
-            rolRepository.save(rolAdmin);
-            rolRepository.save(rolUser);
-            rolRepository.save(rolMedico);
-            rolRepository.save(rolSecretaria);
+@Override
+public void run(String... args) throws Exception {
+    // Verificar si la base de datos ya existe
+    if (!databaseExists()) {
+        // Crear roles
+        Rol rolAdmin = new Rol(RolNombre.ROLE_ADMIN);
+        Rol rolUser = new Rol(RolNombre.ROLE_USER);
+        Rol rolMedico = new Rol(RolNombre.ROLE_MEDICO);
+        Rol rolSecretaria = new Rol(RolNombre.ROLE_SECRETARIA);
 
-            // Crear usuarios con roles asignados
-            Usuario usuarioAdmin = new Usuario("admin", "admin", "admin@gmail.com", "123456");
-            usuarioAdmin.getRoles().add(rolAdmin);
+        // Guardar roles
+        rolRepository.save(rolAdmin);
+        rolRepository.save(rolUser);
+        rolRepository.save(rolMedico);
+        rolRepository.save(rolSecretaria);
 
-            Usuario usuarioUser = new Usuario("user", "user", "user@gmail.com", "123456");
-            usuarioUser.getRoles().add(rolUser);
+        // Crear usuarios con roles asignados
+        Usuario usuarioAdmin = new Usuario("admin", "admin", "admin@gmail.com", passwordEncoder.encode("passwordAdmin"));
+        usuarioAdmin.getRoles().add(rolAdmin);
 
-            Usuario usuarioMedico = new Usuario("medico", "medico", "medico@gmail.com", "123456");
-            usuarioMedico.getRoles().add(rolMedico);
+        Usuario usuarioUser = new Usuario("user", "user", "user@gmail.com", passwordEncoder.encode("passwordUser"));
+        usuarioUser.getRoles().add(rolUser);
 
-            Usuario usuarioSecretaria = new Usuario("secretaria", "secretaria", "secretaria@gmail.com", "123456");
-            usuarioSecretaria.getRoles().add(rolSecretaria);
+        Usuario usuarioMedico = new Usuario("medico", "medico", "medico@gmail.com", passwordEncoder.encode("passwordMedico"));
+        usuarioMedico.getRoles().add(rolMedico);
 
-            // Guardar usuarios
-            usuarioRepository.save(usuarioAdmin);
-            usuarioRepository.save(usuarioUser);
-            usuarioRepository.save(usuarioMedico);
-            usuarioRepository.save(usuarioSecretaria);
-        }
+        Usuario usuarioSecretaria = new Usuario("secretaria", "secretaria", "secretaria@gmail.com", passwordEncoder.encode("passwordSecretaria"));
+        usuarioSecretaria.getRoles().add(rolSecretaria);
+
+        // Guardar usuarios
+        usuarioRepository.save(usuarioAdmin);
+        usuarioRepository.save(usuarioUser);
+        usuarioRepository.save(usuarioMedico);
+        usuarioRepository.save(usuarioSecretaria);
     }
+}
+
 
     private boolean databaseExists() {
         // Verificar si la base de datos ya existe
