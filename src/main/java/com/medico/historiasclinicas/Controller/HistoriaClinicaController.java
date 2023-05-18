@@ -1,6 +1,7 @@
 package com.medico.historiasclinicas.Controller;
 
 import com.medico.historiasclinicas.DTO.HistoriaClinicaDTO;
+import com.medico.historiasclinicas.DTO.PacienteDTO;
 import com.medico.historiasclinicas.Entity.HistoriaClinica;
 import com.medico.historiasclinicas.Entity.Paciente;
 import com.medico.historiasclinicas.Mapper.ActualizacionMapper;
@@ -8,6 +9,7 @@ import com.medico.historiasclinicas.Mapper.ArchivoHistoriaClinicaMapper;
 import com.medico.historiasclinicas.Mapper.HistoriaClinicaMapper;
 import com.medico.historiasclinicas.Service.HistoriaClinicaService;
 import com.medico.historiasclinicas.Service.PacienteService;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ public class HistoriaClinicaController {
     private final HistoriaClinicaMapper historiaClinicaMapper;
     private final ActualizacionMapper actualizacionMapper;
     private final ArchivoHistoriaClinicaMapper archivoHistoriaClinicaMapper;
-    
+
     public HistoriaClinicaController(ActualizacionMapper actualizacionMapper, ArchivoHistoriaClinicaMapper archivoHistoriaClinicaMapper, HistoriaClinicaService historiaClinicaService, HistoriaClinicaMapper historiaClinicaMapper, PacienteService pacienteService) {
         this.actualizacionMapper = actualizacionMapper;
         this.archivoHistoriaClinicaMapper = archivoHistoriaClinicaMapper;
@@ -42,30 +44,26 @@ public class HistoriaClinicaController {
         this.pacienteService = pacienteService;
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<Optional<HistoriaClinica>> getHistoriaClinicaById(@PathVariable("id") Long id) {
         Optional<HistoriaClinica> historiaClinica = historiaClinicaService.buscarHistoriaClinicabyId(id);
         return ResponseEntity.ok().body(historiaClinica);
     }
 
-@PostMapping("/nuevas/{idPaciente}")
-public ResponseEntity<HistoriaClinicaDTO> createHistoriaClinica(@RequestBody HistoriaClinicaDTO historiaClinicaDTO, @PathVariable("idPaciente") Long pacienteId) {
-    // Verificar si el paciente existe
-    Optional<Paciente> pacienteOptional = pacienteService.buscarPorId(pacienteId);
-    if (!pacienteOptional.isPresent()) {
-        throw new RuntimeException("No se encontró un paciente con el ID proporcionado.");
+    @PostMapping("/nuevas/{idPaciente}")
+    public ResponseEntity<HistoriaClinicaDTO> createHistoriaClinica(@RequestBody HistoriaClinicaDTO historiaClinicaDTO, @PathVariable("idPaciente") Long pacienteId) {
+        // Verificar si el paciente existe
+        Optional<Paciente> pacienteOptional = pacienteService.buscarPorId(pacienteId);
+        if (!pacienteOptional.isPresent()) {
+            throw new RuntimeException("No se encontró un paciente con el ID proporcionado.");
+        }
+
+        HistoriaClinica nuevaHistoriaClinica = historiaClinicaService.save(historiaClinicaDTO, pacienteId);
+
+        HistoriaClinicaDTO newHistoriaClinicaDTO = historiaClinicaMapper.toDto(nuevaHistoriaClinica);
+
+        return ResponseEntity.ok(newHistoriaClinicaDTO);
     }
-
-    HistoriaClinica nuevaHistoriaClinica = historiaClinicaService.save(historiaClinicaDTO, pacienteId);
-
-    HistoriaClinicaDTO newHistoriaClinicaDTO = historiaClinicaMapper.toDto(nuevaHistoriaClinica);
-
-    return ResponseEntity.ok(newHistoriaClinicaDTO);
-}
-
-
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHistoriaClinica(@PathVariable("id") Long id) {
@@ -78,7 +76,7 @@ public ResponseEntity<HistoriaClinicaDTO> createHistoriaClinica(@RequestBody His
         Optional<HistoriaClinica> historiasClinicas = historiaClinicaService.buscarPorDniPaciente(dni);
         return ResponseEntity.ok().body(historiasClinicas);
     }
-    
+
     @GetMapping("/paciente")
     public ResponseEntity<List<HistoriaClinica>> getHistoriasClinicasByNombreYApellido(@RequestParam("nombre") String nombre, @RequestParam("apellido") String apellido) {
         List<HistoriaClinica> historiasClinicas = historiaClinicaService.buscarPorNombrePaciente(nombre, apellido);
@@ -90,4 +88,29 @@ public ResponseEntity<HistoriaClinicaDTO> createHistoriaClinica(@RequestBody His
         historiaClinicaService.actualizarHistoriaClinica(historiaClinicaDTO);
         return ResponseEntity.ok("Historia Clínica actualizada exitosamente.");
     }
+
+    @GetMapping("/existe/{id}")
+    public ResponseEntity<PacienteDTO> buscarPorId(@PathVariable("id") Long id) {
+        Optional<Paciente> optPaciente = pacienteService.buscarPorId(id);
+        if (optPaciente.isPresent()) {
+            Paciente paciente = optPaciente.get();
+            PacienteDTO pacienteDTO = new PacienteDTO();
+
+            pacienteDTO.setId(paciente.getId());
+            pacienteDTO.setNombre(paciente.getNombre());
+            pacienteDTO.setApellido(paciente.getApellido());
+            pacienteDTO.setDni(paciente.getDni());
+            pacienteDTO.setFechaNacimiento(paciente.getFechaNacimiento());
+            pacienteDTO.setDireccion(paciente.getDireccion());
+            pacienteDTO.setTelefono(paciente.getTelefono());
+            pacienteDTO.setEmail(paciente.getEmail());
+
+            boolean existeHistoriaClinica = historiaClinicaService.existeHistoriaClinicaPorPacienteId(id);
+            pacienteDTO.setHistoriasClinicas(existeHistoriaClinica ? Collections.singletonList(new HistoriaClinicaDTO()) : Collections.emptyList());
+
+            return ResponseEntity.ok().body(pacienteDTO);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 }

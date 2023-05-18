@@ -119,5 +119,10 @@ public class HistoriaClinicaService {
         entityManager.persist(hc);
         return hc;
     }
+    
+    public boolean existeHistoriaClinicaPorPacienteId(Long pacienteId) {
+        HistoriaClinica historiaClinica = historiaClinicaRepository.findByPacienteId(pacienteId);
+         return historiaClinica != null;
+    }
 
 }
