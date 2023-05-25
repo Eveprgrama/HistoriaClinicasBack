@@ -3,13 +3,16 @@ package com.medico.historiasclinicas.Configuration;
 import com.medico.historiasclinicas.DTO.ActualizacionDTO;
 import com.medico.historiasclinicas.DTO.ArchivoHistoriaClinicaDTO;
 import com.medico.historiasclinicas.DTO.HistoriaClinicaDTO;
+import com.medico.historiasclinicas.DTO.MedicacionDTO;
 import com.medico.historiasclinicas.Entity.Actualizacion;
 import com.medico.historiasclinicas.Entity.ArchivoHistoriaClinica;
 import com.medico.historiasclinicas.Entity.HistoriaClinica;
+import com.medico.historiasclinicas.Entity.Medicacion;
 import com.medico.historiasclinicas.Entity.Paciente;
 import com.medico.historiasclinicas.Mapper.ActualizacionMapper;
 import com.medico.historiasclinicas.Mapper.ArchivoHistoriaClinicaMapper;
 import com.medico.historiasclinicas.Mapper.HistoriaClinicaMapper;
+import com.medico.historiasclinicas.Mapper.MedicacionMapper;
 import com.medico.historiasclinicas.Repository.HistoriaClinicaRepository;
 import com.medico.historiasclinicas.Repository.PacienteRepository;
 import java.util.List;
@@ -34,6 +37,9 @@ public class AppConfig {
     @Autowired
     HistoriaClinicaRepository historiaClinicaRepository;
 
+    @Autowired
+    MedicacionMapper medicacionMapper;
+
     @Bean
     public HistoriaClinicaMapper historiaClinicaMapper() {
         return new HistoriaClinicaMapper() {
@@ -47,9 +53,6 @@ public class AppConfig {
                 dto.setPacienteId(historiaClinica.getPaciente().getId());
                 dto.setEnfermedad(historiaClinica.getEnfermedad());
                 dto.setDescripcion(historiaClinica.getDescripcion());
-                dto.setMedicacion(historiaClinica.getMedicacion());
-                dto.setDroga(historiaClinica.getDroga());
-                dto.setDosis(historiaClinica.getDósis());
                 dto.setPeso(historiaClinica.getPeso());
                 dto.setAltura(historiaClinica.getAltura());
                 dto.setIndicaciones(historiaClinica.getIndicaciones());
@@ -73,6 +76,15 @@ public class AppConfig {
                     dto.setArchivos(archivosDto);
                 }
 
+                // Mapea las medicaciones si no es nulo
+                if (historiaClinica.getMedicacion() != null) {
+                    List<MedicacionDTO> medicacionesDto = historiaClinica.getMedicacion()
+                            .stream()
+                            .map(medicacionMapper::toDto)
+                            .collect(Collectors.toList());
+                    dto.setMedicacion(medicacionesDto);
+                }
+
                 return dto;
             }
 
@@ -87,9 +99,6 @@ public class AppConfig {
                 entity.setPaciente(getPacienteFromId(historiaClinicaDTO.getPacienteId()));
                 entity.setEnfermedad(historiaClinicaDTO.getEnfermedad());
                 entity.setDescripcion(historiaClinicaDTO.getDescripcion());
-                entity.setMedicacion(historiaClinicaDTO.getMedicacion());
-                entity.setDroga(historiaClinicaDTO.getDroga());
-                entity.setDósis(historiaClinicaDTO.getDosis());
                 entity.setPeso(historiaClinicaDTO.getPeso());
                 entity.setAltura(historiaClinicaDTO.getAltura());
                 entity.setIndicaciones(historiaClinicaDTO.getIndicaciones());
@@ -114,6 +123,16 @@ public class AppConfig {
                             .collect(Collectors.toList());
                 }
                 entity.setArchivos(archivos);
+
+                // Mapea las medicaciones
+                List<Medicacion> medicaciones = null;
+                if (historiaClinicaDTO.getMedicacion() != null) {
+                    medicaciones = historiaClinicaDTO.getMedicacion()
+                            .stream()
+                            .map(medicacionMapper::toEntity)
+                            .collect(Collectors.toList());
+                }
+                entity.setMedicacion(medicaciones);
 
                 return entity;
             }
@@ -214,7 +233,41 @@ public class AppConfig {
     }
 
     @Bean
+    public MedicacionMapper medicacionMapper() {
+        return new MedicacionMapper() {
+            @Override
+            public MedicacionDTO toDto(Medicacion medicacion) {
+                if (medicacion == null) {
+                    return null;
+                }
+
+                MedicacionDTO dto = new MedicacionDTO(medicacion);
+                dto.setNombreMedicacion(medicacion.getNombreMedicacion());
+                dto.setDroga(medicacion.getDroga());
+                dto.setDosis(medicacion.getDosis());
+
+                return dto;
+            }
+
+            @Override
+            public Medicacion toEntity(MedicacionDTO medicacionDTO) {
+                if (medicacionDTO == null) {
+                    return null;
+                }
+
+                Medicacion entity = new Medicacion();
+                entity.setNombreMedicacion(medicacionDTO.getNombreMedicacion());
+                entity.setDroga(medicacionDTO.getDroga());
+                entity.setDosis(medicacionDTO.getDosis());
+
+                return entity;
+            }
+        };
+    }
+
+    @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

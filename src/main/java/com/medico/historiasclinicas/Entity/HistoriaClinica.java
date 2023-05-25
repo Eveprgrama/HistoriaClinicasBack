@@ -36,11 +36,8 @@ public class HistoriaClinica {
 
     private String descripcion;
 
-    private String medicacion;
-    
-    private String droga;
-    
-    private String dósis;
+  @OneToMany(mappedBy = "historiaClinica", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<Medicacion> medicacion = new ArrayList<>();
     
     private Double peso;
     
@@ -65,20 +62,19 @@ public class HistoriaClinica {
     public HistoriaClinica() {
     }
 
-public HistoriaClinica(Long id, String fechaCreacion, String enfermedad, String descripcion, String medicacion, String droga, String dosis, Double peso, Double altura, String indicaciones, Paciente paciente, List<ArchivoHistoriaClinica> archivosHistoriaClinica) {
-    this.id = id;
-    this.fechaCreacion = fechaCreacion;
-    this.enfermedad = enfermedad;
-    this.descripcion = descripcion;
-    this.medicacion = medicacion;
-    this.droga = droga;
-    this.dósis = dosis;
-    this.peso = peso;
-    this.altura = altura;
-    this.indicaciones = indicaciones;
-    this.paciente = paciente;
-    this.archivosHistoriaClinica = archivosHistoriaClinica;
-}
+    public HistoriaClinica(Long id, String fechaCreacion, String enfermedad, String descripcion, Double peso, Double altura, String indicaciones, Paciente paciente, List<ArchivoHistoriaClinica> archivosHistoriaClinica) {
+        this.id = id;
+        this.fechaCreacion = fechaCreacion;
+        this.enfermedad = enfermedad;
+        this.descripcion = descripcion;
+        this.peso = peso;
+        this.altura = altura;
+        this.indicaciones = indicaciones;
+        this.paciente = paciente;
+        this.archivosHistoriaClinica = archivosHistoriaClinica;
+    }
+
+
 
 
 

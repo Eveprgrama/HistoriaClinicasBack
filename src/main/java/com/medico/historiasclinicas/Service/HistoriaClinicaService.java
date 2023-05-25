@@ -4,10 +4,12 @@ import com.medico.historiasclinicas.DTO.HistoriaClinicaDTO;
 import com.medico.historiasclinicas.Entity.Actualizacion;
 import com.medico.historiasclinicas.Entity.ArchivoHistoriaClinica;
 import com.medico.historiasclinicas.Entity.HistoriaClinica;
+import com.medico.historiasclinicas.Entity.Medicacion;
 import com.medico.historiasclinicas.Entity.Paciente;
 import com.medico.historiasclinicas.Mapper.ActualizacionMapper;
 import com.medico.historiasclinicas.Mapper.ArchivoHistoriaClinicaMapper;
 import com.medico.historiasclinicas.Mapper.HistoriaClinicaMapper;
+import com.medico.historiasclinicas.Mapper.MedicacionMapper;
 import com.medico.historiasclinicas.Repository.ActualizacionRepository;
 import com.medico.historiasclinicas.Repository.HistoriaClinicaRepository;
 import com.medico.historiasclinicas.Repository.PacienteRepository;
@@ -45,6 +47,9 @@ public class HistoriaClinicaService {
 
     @Autowired
     private HistoriaClinicaMapper historiaClinicaMapper;
+    
+    @Autowired
+    private MedicacionMapper medicacionMapper;
 
     public Optional<HistoriaClinica> buscarHistoriaClinicabyId(Long Id) {
         return historiaClinicaRepository.findById(Id);
@@ -66,9 +71,6 @@ public class HistoriaClinicaService {
         // Actualizar los campos de la historia clínica con los valores del DTO.
         historiaClinica.setEnfermedad(historiaClinicaDTO.getEnfermedad());
         historiaClinica.setDescripcion(historiaClinicaDTO.getDescripcion());
-        historiaClinica.setMedicacion(historiaClinicaDTO.getMedicacion());
-        historiaClinica.setDroga(historiaClinicaDTO.getDroga());
-        historiaClinica.setDósis(historiaClinicaDTO.getDosis());
         historiaClinica.setPeso(historiaClinicaDTO.getPeso());
         historiaClinica.setAltura(historiaClinicaDTO.getAltura());
         historiaClinica.setIndicaciones(historiaClinicaDTO.getIndicaciones());
@@ -103,6 +105,12 @@ public class HistoriaClinicaService {
 
         HistoriaClinica hc = historiaClinicaMapper.toEntity(hcDTO);
         hc.setPaciente(paciente);
+        
+        List<Medicacion> medicaciones = hcDTO.getMedicacion().stream()
+            .map(medicacionMapper::toEntity)
+            .collect(Collectors.toList());
+    hc.setMedicacion(medicaciones);
+    medicaciones.forEach(medicacion -> medicacion.setHistoriaClinica(hc));
 
         List<Actualizacion> actualizaciones = hcDTO.getActualizaciones().stream()
                 .map(actualizacionMapper::toEntity)

@@ -3,9 +3,11 @@ package com.medico.historiasclinicas.Controller;
 import com.medico.historiasclinicas.DTO.ActualizacionDTO;
 import com.medico.historiasclinicas.DTO.ArchivoHistoriaClinicaDTO;
 import com.medico.historiasclinicas.DTO.HistoriaClinicaDTO;
+import com.medico.historiasclinicas.DTO.MedicacionDTO;
 import com.medico.historiasclinicas.Entity.Actualizacion;
 import com.medico.historiasclinicas.Entity.ArchivoHistoriaClinica;
 import com.medico.historiasclinicas.Entity.HistoriaClinica;
+import com.medico.historiasclinicas.Entity.Medicacion;
 import com.medico.historiasclinicas.Service.ActualizacionService;
 import com.medico.historiasclinicas.Service.HistoriaClinicaService;
 import java.util.ArrayList;
@@ -76,9 +78,6 @@ public class ActualizacionController {
         historiaClinicaDTO.setFechaCreacion(historiaClinica.getFechaCreacion());
         historiaClinicaDTO.setEnfermedad(historiaClinica.getEnfermedad());
         historiaClinicaDTO.setDescripcion(historiaClinica.getDescripcion());
-        historiaClinicaDTO.setMedicacion(historiaClinica.getMedicacion());
-        historiaClinicaDTO.setDroga(historiaClinica.getDroga());
-        historiaClinicaDTO.setDosis(historiaClinica.getDósis());
         historiaClinicaDTO.setPeso(historiaClinica.getPeso());
         historiaClinicaDTO.setAltura(historiaClinica.getAltura());
         historiaClinicaDTO.setIndicaciones(historiaClinica.getIndicaciones());
@@ -88,6 +87,12 @@ public class ActualizacionController {
             archivosDTO.add(new ArchivoHistoriaClinicaDTO(archivo));
         }
         historiaClinicaDTO.setArchivos(archivosDTO);
+        
+        List<MedicacionDTO> medicacionDTO = new ArrayList<>();
+        for (Medicacion medicacion : historiaClinica.getMedicacion()){
+            medicacionDTO.add(new MedicacionDTO(medicacion));
+        }
+        historiaClinicaDTO.setMedicacion(medicacionDTO);
 
         List<ActualizacionDTO> actualizacionesDTO = new ArrayList<>();
         for (Actualizacion actualizacion : actualizaciones) {
